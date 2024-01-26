@@ -35,7 +35,7 @@ blueprint:
       default: ''
       selector:
         device:
-          domain: light
+          integration: light
     up_down_toggle:
       name: (Required) Toggle for dimming
       description: Toggle, ob zuletzt nach oben oder nach unten gedimmt wurde.
