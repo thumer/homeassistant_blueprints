@@ -23,19 +23,12 @@ blueprint:
         entity:
           domain: input_text
     light_for_control:
-      name: (Required) Light Entity for Status reading
-      description: Licht, das gesteuert werden soll.
+      name: (Required) Light for Status reading
+      description: Ließt den Zustand aus, ob das Licht leuchtet oder nicht.
       default: ''
       selector:
         entity:
           domain: light
-    light_device_for_control:
-      name: (Required) Light Device for Status reading
-      description: Licht, das gesteuert werden soll.
-      default: ''
-      selector:
-        device:
-          integration: light
     up_down_toggle:
       name: (Required) Toggle for dimming
       description: Toggle, ob zuletzt nach oben oder nach unten gedimmt wurde.
@@ -43,6 +36,43 @@ blueprint:
       selector:
         entity:
           domain: input_boolean
+    # inputs for custom actions
+    action_button_on_short:
+      name: (Optional) On button short press
+      description: Action to run on short on button press.
+      default: []
+      selector:
+        action:
+    action_button_on_long:
+      name: (Optional) On button long press
+      description: Action to run on long on button press.
+      default: []
+      selector:
+        action:
+    action_button_on_release:
+      name: (Optional) On button release
+      description: Action to run on on button release after long press.
+      default: []
+      selector:
+        action:
+    action_button_off_short:
+      name: (Optional) Off button short press
+      description: Action to run on short off button press.
+      default: []
+      selector:
+        action:
+    action_button_off_long:
+      name: (Optional) Off button long press
+      description: Action to run on long off button press.
+      default: []
+      selector:
+        action:
+    action_button_off_release:
+      name: (Optional) Off button release
+      description: Action to run on off button release after long press.
+      default: []
+      selector:
+        action:
     # inputs for looping custom actions on long button press events until the corresponding release event is received
     button_on_long_loop:
       name: (Optional) On button long press - loop until release
@@ -104,19 +134,16 @@ variables:
   helper_debounce_delay: !input helper_debounce_delay
   # mapping between actions
   actions_mapping:
-    button_on_short: [left_press]
+    button_on_short: [left_press, left_press_release]
     button_on_long: [left_hold]
-    button_on_release: [left_press_release]
+    button_on_release: [left_hold_release]
   # no need to perform this task at automation runtime
   button_on_short: '{{ actions_mapping["button_on_short"] }}'
   button_on_long: '{{ actions_mapping["button_on_long"] }}'
   button_on_release: '{{ actions_mapping["button_on_release"] }}'
   # build data to send within a controller event
   controller_entity: !input controller_entity
-  controller_id: controller_entity
-  light_for_control: !input light_for_control
-  light_device_for_control: !input light_device_for_control
-  up_down_toggle: !input up_down_toggle
+  controller_id: '{{controller_entity}}'
 mode: restart
 max_exceeded: silent
 trigger:
@@ -156,67 +183,47 @@ action:
       value: '{{ {"a":trigger_action,"t":as_timestamp(now())} | to_json }}'
   # choose the sequence to run based on the received button event
   - choose:
+      - conditions: '{{ trigger_action | string in button_on_short }}'
+        sequence:
+          - conditions: '{{ is_state(light_for_control, off) }}'
+            sequence: !input action_button_on_short
+          - conditions: '{{ is_state(light_for_control, on) }}'
+            sequence: !input action_button_off_short
       - conditions: '{{ trigger_action | string in button_on_long }}'
         sequence:
           - choose:
-              - conditions: '{{ is_state("up_down_toggle", "off") }}'
+              - conditions: '{{ is_state(up_down_toggle, off) }}'
                 sequence:
                   - service: input_boolean.turn_on
                     data:
-                      entity_id: up_down_toggle
+                      entity_id: !input up_down_toggle
                   - choose:
                       # if looping is enabled, loop the action for a finite number of iterations
                       - conditions: '{{ button_on_long_loop }}'
                         sequence:
                           - repeat:
                               while: '{{ repeat.index < button_on_long_max_loop_repeats | int }}'
-                              sequence:
-                                - device_id: light_device_for_control
-                                  domain: light
-                                  entity_id: light_for_control
-                                  type: brightness_increase
+                              sequence: !input action_button_on_long
                     # if looping is not enabled run the custom action only once
-                    default:
-                      - device_id: light_device_for_control
-                        domain: light
-                        entity_id: light_for_control
-                        type: brightness_increase
-              - conditions: '{{ is_state("up_down_toggle", "on") }}'
+                    default: !input action_button_on_long
+              - conditions: '{{ is_state(up_down_toggle, on) }}'
                 sequence:
                   - service: input_boolean.turn_off
                     data:
-                      entity_id: up_down_toggle
+                      entity_id: !input up_down_toggle
                   - choose:
                       # if looping is enabled, loop the action for a finite number of iterations
                       - conditions: '{{ button_off_long_loop }}'
                         sequence:
                           - repeat:
                               while: '{{ repeat.index < button_off_long_max_loop_repeats | int }}'
-                              sequence:
-                                - device_id: light_device_for_control
-                                  domain: light
-                                  entity_id: light_for_control
-                                  type: brightness_decrease
+                              sequence: !input action_button_off_long
                     # if looping is not enabled run the custom action only once
-                    default:
-                      - device_id: light_device_for_control
-                        domain: light
-                        entity_id: light_for_control
-                        type: brightness_decrease
+                    default: !input action_button_off_long
       - conditions: '{{ trigger_action | string in button_on_release }}'
         sequence:
           - choose:
-              - conditions: '{{ is_state("light_for_control", "off") }}'
-                sequence:
-                  - service: light.turn_on
-                    metadata: {}
-                    data: {}
-                    target:
-                      entity_id: light_for_control
-              - conditions: '{{ is_state("light_for_control", "on") }}'
-                sequence:
-                  - service: light.turn_off
-                    metadata: {}
-                    data: {}
-                    target:
-                      entity_id: light_for_control
+              - conditions: '{{ is_state(light_for_control, off) }}'
+                sequence: !input action_button_on_release
+              - conditions: '{{ is_state(light_for_control, on) }}'
+                sequence: !input action_button_off_release
