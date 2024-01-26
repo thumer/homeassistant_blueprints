@@ -144,7 +144,7 @@ variables:
   # build data to send within a controller event
   light_for_control: !input light_for_control
   controller_entity: !input controller_entity
-  controller_id: '{{controller_entity}}'
+  controller_id: controller_entity
 mode: restart
 max_exceeded: silent
 trigger:
@@ -187,14 +187,14 @@ action:
       - conditions: '{{ trigger_action | string in button_on_short }}'
         sequence:
           - choose:
-              - conditions: '{{ is_state("light_for_control", "off") }}'
+              - conditions: '{{ is_state(light_for_control, "off") }}'
                 sequence: !input action_button_on_short
-              - conditions: '{{ is_state("light_for_control", "on") }}'
+              - conditions: '{{ is_state(light_for_control, "on") }}'
                 sequence: !input action_button_off_short
       - conditions: '{{ trigger_action | string in button_on_long }}'
         sequence:
           - choose:
-              - conditions: '{{ is_state("up_down_toggle", "off") }}'
+              - conditions: '{{ is_state(up_down_toggle, "off") }}'
                 sequence:
                   - service: input_boolean.turn_on
                     data:
@@ -208,7 +208,7 @@ action:
                               sequence: !input action_button_on_long
                     # if looping is not enabled run the custom action only once
                     default: !input action_button_on_long
-              - conditions: '{{ is_state("up_down_toggle", "on") }}'
+              - conditions: '{{ is_state(up_down_toggle, "on") }}'
                 sequence:
                   - service: input_boolean.turn_off
                     data:
@@ -225,7 +225,7 @@ action:
       - conditions: '{{ trigger_action | string in button_on_release }}'
         sequence:
           - choose:
-              - conditions: '{{ is_state("light_for_control", "off") }}'
+              - conditions: '{{ is_state(light_for_control, "off") }}'
                 sequence: !input action_button_on_release
-              - conditions: '{{ is_state("light_for_control", "on") }}'
+              - conditions: '{{ is_state(light_for_control, "on") }}'
                 sequence: !input action_button_off_release
