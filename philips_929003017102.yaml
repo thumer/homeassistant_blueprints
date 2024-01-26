@@ -220,12 +220,12 @@ action:
       - conditions: '{{ trigger_action | string in button_hold_release }}'
         sequence:
           - choose:
-              - conditions: '{{ is_state(light_for_control, "off") }}'
+              - conditions: '{{ is_state(up_down_toggle, "off") }}'
                 sequence:
                   - service: input_boolean.turn_on
                     data:
                       entity_id: !input up_down_toggle
-              - conditions: '{{ is_state(light_for_control, "on") }}'
+              - conditions: '{{ is_state(up_down_toggle, "on") }}'
                 sequence:
                   - service: input_boolean.turn_off
                     data:
