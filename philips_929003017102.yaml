@@ -149,8 +149,6 @@ variables:
   helper_debounce_delay: !input helper_debounce_delay
   # integration id used to select items in the action mapping
   integration_id: '{{ integration | lower }}'
-  # adjusted debounce delay so that the resulting double press delay is exactly as specified by the user when running the action, taking also account of debouncing
-  # make sure it never goes below the minimum double press delay
   # mapping between actions and integrations
   actions_mapping:
     zha:
