@@ -158,65 +158,65 @@ action:
   - choose:
       - conditions: '{{ trigger_action | string in button_on_long }}'
         sequence:
-          - conditions: '{{ is_state("up_down_toggle", "off") }}'
-            sequence:
-              - service: input_boolean.turn_on
-                data:
-                  entity_id: up_down_toggle
-              - choose:
-                  # if looping is enabled, loop the action for a finite number of iterations
-                  - conditions: '{{ button_on_long_loop }}'
-                    sequence:
-                      - repeat:
-                          while: '{{ repeat.index < button_on_long_max_loop_repeats | int }}'
-                          sequence:
-                            - device_id: light_device_for_control
-                              domain: light
-                              entity_id: light_for_control
-                              type: brightness_increase
-                  # if looping is not enabled run the custom action only once
-                  - conditions: '{{ not button_on_long_loop }}'
-                    sequence:
+          - choose:
+              - conditions: '{{ is_state("up_down_toggle", "off") }}'
+                sequence:
+                  - service: input_boolean.turn_on
+                    data:
+                      entity_id: up_down_toggle
+                  - choose:
+                      # if looping is enabled, loop the action for a finite number of iterations
+                      - conditions: '{{ button_on_long_loop }}'
+                        sequence:
+                          - repeat:
+                              while: '{{ repeat.index < button_on_long_max_loop_repeats | int }}'
+                              sequence:
+                                - device_id: light_device_for_control
+                                  domain: light
+                                  entity_id: light_for_control
+                                  type: brightness_increase
+                    # if looping is not enabled run the custom action only once
+                    default:
                       - device_id: light_device_for_control
                         domain: light
                         entity_id: light_for_control
                         type: brightness_increase
-          - conditions: '{{ is_state("up_down_toggle", "on") }}'
-            sequence:
-              - service: input_boolean.turn_off
-                data:
-                  entity_id: up_down_toggle
-              - choose:
-                  # if looping is enabled, loop the action for a finite number of iterations
-                  - conditions: '{{ button_off_long_loop }}'
-                    sequence:
-                      - repeat:
-                          while: '{{ repeat.index < button_off_long_max_loop_repeats | int }}'
-                          sequence:
-                            - device_id: light_device_for_control
-                              domain: light
-                              entity_id: light_for_control
-                              type: brightness_decrease
-                # if looping is not enabled run the custom action only once
-                  - conditions: '{{ not button_off_long_loop }}'
-                    sequence:
+              - conditions: '{{ is_state("up_down_toggle", "on") }}'
+                sequence:
+                  - service: input_boolean.turn_off
+                    data:
+                      entity_id: up_down_toggle
+                  - choose:
+                      # if looping is enabled, loop the action for a finite number of iterations
+                      - conditions: '{{ button_off_long_loop }}'
+                        sequence:
+                          - repeat:
+                              while: '{{ repeat.index < button_off_long_max_loop_repeats | int }}'
+                              sequence:
+                                - device_id: light_device_for_control
+                                  domain: light
+                                  entity_id: light_for_control
+                                  type: brightness_decrease
+                    # if looping is not enabled run the custom action only once
+                    default:
                       - device_id: light_device_for_control
                         domain: light
                         entity_id: light_for_control
                         type: brightness_decrease
       - conditions: '{{ trigger_action | string in button_on_release }}'
         sequence:
-          - conditions: '{{ is_state("light_for_control", "off") }}'
-            sequence:
-              - service: light.turn_on
-                metadata: {}
-                data: {}
-                target:
-                  entity_id: light_for_control
-          - conditions: '{{ is_state("light_for_control", "on") }}'
-            sequence:
-              - service: light.turn_off
-                metadata: {}
-                data: {}
-                target:
-                  entity_id: light_for_control
+          - choose:
+              - conditions: '{{ is_state("light_for_control", "off") }}'
+                sequence:
+                  - service: light.turn_on
+                    metadata: {}
+                    data: {}
+                    target:
+                      entity_id: light_for_control
+              - conditions: '{{ is_state("light_for_control", "on") }}'
+                sequence:
+                  - service: light.turn_off
+                    metadata: {}
+                    data: {}
+                    target:
+                      entity_id: light_for_control
