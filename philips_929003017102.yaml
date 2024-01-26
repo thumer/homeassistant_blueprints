@@ -39,13 +39,13 @@ blueprint:
     # inputs for custom actions
     action_button_press_release_on:
       name: (Optional) On button press release 1
-      description: 
+      description: On button press release 1
       default: []
       selector:
         action:
     action_button_hold_on:
       name: (Optional) On button hold 1
-      description: 
+      description: On button hold 1
       default: []
       selector:
         action:
@@ -57,13 +57,13 @@ blueprint:
     #     action:
     action_button_press_release_off:
       name: (Optional) On button press release 2
-      description: 
+      description: On button press release 2
       default: []
       selector:
         action:
     action_button_hold_off:
       name: (Optional) On button hold 2
-      description: 
+      description: On button hold 2
       default: []
       selector:
         action:
