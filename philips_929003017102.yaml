@@ -142,6 +142,7 @@ variables:
   button_on_long: '{{ actions_mapping["button_on_long"] }}'
   button_on_release: '{{ actions_mapping["button_on_release"] }}'
   # build data to send within a controller event
+  light_for_control: !input light_for_control
   controller_entity: !input controller_entity
   controller_id: '{{controller_entity}}'
 mode: restart
