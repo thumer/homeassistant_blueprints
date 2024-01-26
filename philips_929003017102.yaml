@@ -134,13 +134,13 @@ variables:
   helper_debounce_delay: !input helper_debounce_delay
   # mapping between actions
   actions_mapping:
-    button_on_short: [left_press]
-    button_on_long: [left_hold]
-    button_on_release: [left_press_release]
+    button_press_release: [left_press_release]
+    button_press_hold: [left_hold]
+    button_press_hold_release: [left_hold_release]
   # no need to perform this task at automation runtime
-  button_on_short: '{{ actions_mapping["button_on_short"] }}'
-  button_on_long: '{{ actions_mapping["button_on_long"] }}'
-  button_on_release: '{{ actions_mapping["button_on_release"] }}'
+  button_press_release: '{{ actions_mapping["button_press_release"] }}'
+  button_press_hold: '{{ actions_mapping["button_press_hold"] }}'
+  button_press_hold_release: '{{ actions_mapping["button_press_hold_release"] }}'
   # build data to send within a controller event
   light_for_control: !input light_for_control
   up_down_toggle: !input up_down_toggle
@@ -185,14 +185,14 @@ action:
       value: '{{ {"a":trigger_action,"t":as_timestamp(now())} | to_json }}'
   # choose the sequence to run based on the received button event
   - choose:
-      - conditions: '{{ trigger_action | string in button_on_short }}'
+      - conditions: '{{ trigger_action | string in button_press_release }}'
         sequence:
           - choose:
               - conditions: '{{ is_state(light_for_control, "off") }}'
                 sequence: !input action_button_on_short
               - conditions: '{{ is_state(light_for_control, "on") }}'
                 sequence: !input action_button_off_short
-      - conditions: '{{ trigger_action | string in button_on_long }}'
+      - conditions: '{{ trigger_action | string in button_press_hold }}'
         sequence:
           - choose:
               - conditions: '{{ is_state(light_for_control, "on") and is_state(up_down_toggle, "off") }}'
@@ -217,7 +217,7 @@ action:
                               sequence: !input action_button_off_long
                     # if looping is not enabled run the custom action only once
                     default: !input action_button_off_long
-      - conditions: '{{ trigger_action | string in button_on_release }}'
+      - conditions: '{{ trigger_action | string in button_press_hold_release }}'
         sequence:
           - choose:
               - conditions: '{{ is_state(light_for_control, "off") }}'
@@ -225,10 +225,8 @@ action:
                   - service: input_boolean.turn_on
                     data:
                       entity_id: !input up_down_toggle
-                  - !input action_button_on_release
               - conditions: '{{ is_state(light_for_control, "on") }}'
                 sequence:
                   - service: input_boolean.turn_off
                     data:
                       entity_id: !input up_down_toggle
-                  - !input action_button_off_release
