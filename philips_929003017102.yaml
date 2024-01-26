@@ -37,42 +37,42 @@ blueprint:
         entity:
           domain: input_boolean
     # inputs for custom actions
-    action_button_on_short:
-      name: (Optional) On button short press
-      description: Action to run on short on button press.
+    action_button_press_release_on:
+      name: (Optional) On button press release 1
+      description: 
       default: []
       selector:
         action:
-    action_button_on_long:
-      name: (Optional) On button long press
-      description: Action to run on long on button press.
+    action_button_hold_on:
+      name: (Optional) On button hold 1
+      description: 
       default: []
       selector:
         action:
-    action_button_on_release:
-      name: (Optional) On button release
-      description: Action to run on on button release after long press.
+    # action_button_hold_release_on:
+    #   name: (Optional) On button release
+    #   description: Action to run on on button release after long press.
+    #   default: []
+    #   selector:
+    #     action:
+    action_button_press_release_off:
+      name: (Optional) On button press release 2
+      description: 
       default: []
       selector:
         action:
-    action_button_off_short:
-      name: (Optional) Off button short press
-      description: Action to run on short off button press.
+    action_button_hold_off:
+      name: (Optional) On button hold 2
+      description: 
       default: []
       selector:
         action:
-    action_button_off_long:
-      name: (Optional) Off button long press
-      description: Action to run on long off button press.
-      default: []
-      selector:
-        action:
-    action_button_off_release:
-      name: (Optional) Off button release
-      description: Action to run on off button release after long press.
-      default: []
-      selector:
-        action:
+    # action_button_hold_release_off:
+    #   name: (Optional) Off button release
+    #   description: Action to run on off button release after long press.
+    #   default: []
+    #   selector:
+    #     action:
     # inputs for looping custom actions on long button press events until the corresponding release event is received
     button_on_long_loop:
       name: (Optional) On button long press - loop until release
@@ -189,9 +189,9 @@ action:
         sequence:
           - choose:
               - conditions: '{{ is_state(light_for_control, "off") }}'
-                sequence: !input action_button_on_short
+                sequence: !input action_button_press_release_on
               - conditions: '{{ is_state(light_for_control, "on") }}'
-                sequence: !input action_button_off_short
+                sequence: !input action_button_press_release_off
       - conditions: '{{ trigger_action | string in button_hold }}'
         sequence:
           - choose:
@@ -203,9 +203,9 @@ action:
                         sequence:
                           - repeat:
                               while: '{{ repeat.index < button_on_long_max_loop_repeats | int }}'
-                              sequence: !input action_button_on_long
+                              sequence: !input action_button_hold_on
                     # if looping is not enabled run the custom action only once
-                    default: !input action_button_on_long
+                    default: !input action_button_hold_on
               - conditions: '{{ is_state(light_for_control, "on") and is_state(up_down_toggle, "on") }}'
                 sequence:
                   - choose:
@@ -214,9 +214,9 @@ action:
                         sequence:
                           - repeat:
                               while: '{{ repeat.index < button_off_long_max_loop_repeats | int }}'
-                              sequence: !input action_button_off_long
+                              sequence: !input action_button_hold_off
                     # if looping is not enabled run the custom action only once
-                    default: !input action_button_off_long
+                    default: !input action_button_hold_off
       - conditions: '{{ trigger_action | string in button_hold_release }}'
         sequence:
           - choose:
