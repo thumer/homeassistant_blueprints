@@ -186,23 +186,9 @@ action:
       - conditions: '{{ trigger_action | string in button_on_short }}'
         sequence:
           - conditions: '{{ is_state(light_for_control, off) }}'
-            sequence:
-              # - event: ahb_controller_event
-              #   event_data:
-              #     controller: '{{ controller_id }}'
-              #     action: button_on_short
-              - choose:
-                  - conditions: []
-                    sequence: !input action_button_on_short
+            sequence: !input action_button_on_short
           - conditions: '{{ is_state(light_for_control, on) }}'
-            sequence:
-              # - event: ahb_controller_event
-              #   event_data:
-              #     controller: '{{ controller_id }}'
-              #     action: button_off_short
-              - choose:
-                  - conditions: []
-                    sequence: !input action_button_off_short
+            sequence: !input action_button_off_short
       - conditions: '{{ trigger_action | string in button_on_long }}'
         sequence:
           - conditions: '{{ is_state(up_down_toggle, off) }}'
@@ -210,10 +196,6 @@ action:
               - service: input_boolean.turn_on
                 data:
                   entity_id: !input up_down_toggle
-              # - event: ahb_controller_event
-              #   event_data:
-              #     controller: '{{ controller_id }}'
-              #     action: button_on_long
               - choose:
                   # if looping is enabled, loop the action for a finite number of iterations
                   - conditions: '{{ button_on_long_loop }}'
@@ -228,10 +210,6 @@ action:
               - service: input_boolean.turn_off
                 data:
                   entity_id: !input up_down_toggle
-              # - event: ahb_controller_event
-              #   event_data:
-              #     controller: '{{ controller_id }}'
-              #     action: button_off_long
               - choose:
                   # if looping is enabled, loop the action for a finite number of iterations
                   - conditions: '{{ button_off_long_loop }}'
@@ -244,24 +222,6 @@ action:
       - conditions: '{{ trigger_action | string in button_on_release }}'
         sequence:
           - conditions: '{{ is_state(light_for_control, off) }}'
-            sequence:
-              # fire the event
-              # - event: ahb_controller_event
-              #   event_data:
-              #     controller: '{{ controller_id }}'
-              #     action: button_on_release
-              # run the custom action
-              - choose:
-                  - conditions: []
-                    sequence: !input action_button_on_release
+            sequence: !input action_button_on_release
           - conditions: '{{ is_state(light_for_control, on) }}'
-            sequence:
-              # fire the event
-              # - event: ahb_controller_event
-              #   event_data:
-              #     controller: '{{ controller_id }}'
-              #     action: button_off_release
-              # run the custom action
-              - choose:
-                  - conditions: []
-                    sequence: !input action_button_off_release
+            sequence: !input action_button_off_release
