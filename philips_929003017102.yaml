@@ -143,6 +143,7 @@ variables:
   button_on_release: '{{ actions_mapping["button_on_release"] }}'
   # build data to send within a controller event
   light_for_control: !input light_for_control
+  up_down_toggle: !input up_down_toggle
   controller_entity: !input controller_entity
   controller_id: controller_entity
 mode: restart
