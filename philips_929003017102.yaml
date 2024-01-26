@@ -197,9 +197,6 @@ action:
           - choose:
               - conditions: '{{ is_state(light_for_control, "on") and is_state(up_down_toggle, "off") }}'
                 sequence:
-                  - service: input_boolean.turn_on
-                    data:
-                      entity_id: !input up_down_toggle
                   - choose:
                       # if looping is enabled, loop the action for a finite number of iterations
                       - conditions: '{{ button_on_long_loop }}'
@@ -211,9 +208,6 @@ action:
                     default: !input action_button_on_long
               - conditions: '{{ is_state(light_for_control, "on") and is_state(up_down_toggle, "on") }}'
                 sequence:
-                  - service: input_boolean.turn_off
-                    data:
-                      entity_id: !input up_down_toggle
                   - choose:
                       # if looping is enabled, loop the action for a finite number of iterations
                       - conditions: '{{ button_off_long_loop }}'
@@ -227,6 +221,14 @@ action:
         sequence:
           - choose:
               - conditions: '{{ is_state(light_for_control, "off") }}'
-                sequence: !input action_button_on_release
+                sequence:
+                  - service: input_boolean.turn_on
+                    data:
+                      entity_id: !input up_down_toggle
+                  - !input action_button_on_release
               - conditions: '{{ is_state(light_for_control, "on") }}'
-                sequence: !input action_button_off_release
+                sequence:
+                  - service: input_boolean.turn_off
+                    data:
+                      entity_id: !input up_down_toggle
+                  - !input action_button_off_release
