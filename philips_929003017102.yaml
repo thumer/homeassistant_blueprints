@@ -135,12 +135,12 @@ variables:
   # mapping between actions
   actions_mapping:
     button_press_release: [left_press_release]
-    button_press_hold: [left_hold]
-    button_press_hold_release: [left_hold_release]
+    button_hold: [left_hold]
+    button_hold_release: [left_hold_release]
   # no need to perform this task at automation runtime
   button_press_release: '{{ actions_mapping["button_press_release"] }}'
-  button_press_hold: '{{ actions_mapping["button_press_hold"] }}'
-  button_press_hold_release: '{{ actions_mapping["button_press_hold_release"] }}'
+  button_hold: '{{ actions_mapping["button_hold"] }}'
+  button_hold_release: '{{ actions_mapping["button_hold_release"] }}'
   # build data to send within a controller event
   light_for_control: !input light_for_control
   up_down_toggle: !input up_down_toggle
@@ -192,7 +192,7 @@ action:
                 sequence: !input action_button_on_short
               - conditions: '{{ is_state(light_for_control, "on") }}'
                 sequence: !input action_button_off_short
-      - conditions: '{{ trigger_action | string in button_press_hold }}'
+      - conditions: '{{ trigger_action | string in button_hold }}'
         sequence:
           - choose:
               - conditions: '{{ is_state(light_for_control, "on") and is_state(up_down_toggle, "off") }}'
@@ -217,7 +217,7 @@ action:
                               sequence: !input action_button_off_long
                     # if looping is not enabled run the custom action only once
                     default: !input action_button_off_long
-      - conditions: '{{ trigger_action | string in button_press_hold_release }}'
+      - conditions: '{{ trigger_action | string in button_hold_release }}'
         sequence:
           - choose:
               - conditions: '{{ is_state(light_for_control, "off") }}'
