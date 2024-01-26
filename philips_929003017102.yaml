@@ -143,7 +143,9 @@ variables:
   button_on_release: '{{ actions_mapping["button_on_release"] }}'
   # build data to send within a controller event
   controller_entity: !input controller_entity
-  controller_id: '{{controller_entity}}'
+  controller_id: controller_entity
+  light_for_control: !input light_for_control
+  up_down_toggle: !input up_down_toggle
 mode: restart
 max_exceeded: silent
 trigger:
@@ -195,7 +197,7 @@ action:
             sequence:
               - service: input_boolean.turn_on
                 data:
-                  entity_id: !input up_down_toggle
+                  entity_id: up_down_toggle
               - choose:
                   # if looping is enabled, loop the action for a finite number of iterations
                   - conditions: '{{ button_on_long_loop }}'
@@ -209,7 +211,7 @@ action:
             sequence:
               - service: input_boolean.turn_off
                 data:
-                  entity_id: !input up_down_toggle
+                  entity_id: up_down_toggle
               - choose:
                   # if looping is enabled, loop the action for a finite number of iterations
                   - conditions: '{{ button_off_long_loop }}'
